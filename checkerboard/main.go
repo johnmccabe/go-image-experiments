@@ -15,16 +15,7 @@ func main() {
 	const filename = "checkerboard.png"
 
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			if (x+y)%2 == 0 {
-				img.Set(x, y, colornames.White)
-			} else {
-				img.Set(x, y, colornames.Black)
-			}
-
-		}
-	}
+	img = generateCheckerboard(img)
 
 	f, err := os.Create(filename)
 	if err != nil {
@@ -38,4 +29,18 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("Saved to image [%s]", filename)
+}
+
+func generateCheckerboard(img *image.RGBA) *image.RGBA {
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+			if (x+y)%2 == 0 {
+				img.Set(x, y, colornames.White)
+			} else {
+				img.Set(x, y, colornames.Black)
+			}
+
+		}
+	}
+	return img
 }
