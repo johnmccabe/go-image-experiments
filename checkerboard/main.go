@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"image"
+	"image/color"
 	"image/png"
 	"log"
 	"os"
@@ -10,12 +12,17 @@ import (
 )
 
 func main() {
-	log.Println("Generating Checkerboard...")
+	border := flag.Bool("b", false, "generate border")
+	flag.Parse()
+
 	const width, height = 128, 32
 	const filename = "checkerboard.png"
 
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	img = generateCheckerboard(img)
+	if *border {
+		img = generateBorder(img, colornames.White)
+	}
 
 	f, err := os.Create(filename)
 	if err != nil {
@@ -32,6 +39,7 @@ func main() {
 }
 
 func generateCheckerboard(img *image.RGBA) *image.RGBA {
+	log.Println("Generating Checkerboard...")
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
 		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
 			if (x+y)%2 == 0 {
@@ -41,6 +49,19 @@ func generateCheckerboard(img *image.RGBA) *image.RGBA {
 			}
 
 		}
+	}
+	return img
+}
+
+func generateBorder(img *image.RGBA, col color.Color) *image.RGBA {
+	log.Println("Generating Border...")
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		img.Set(img.Bounds().Min.X, y, col)
+		img.Set(img.Bounds().Max.X-1, y, col)
+	}
+	for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+		img.Set(x, img.Bounds().Min.Y, col)
+		img.Set(x, img.Bounds().Max.Y-1, col)
 	}
 	return img
 }
